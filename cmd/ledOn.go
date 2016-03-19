@@ -27,7 +27,7 @@ import (
 	
 	"time"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/raspi"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
