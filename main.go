@@ -20,8 +20,12 @@
 
 package main
 
-import "github.com/colemanserious/furby-gobot/cmd"
+import (
+	_ "github.com/colemanserious/furby-gobot/cmd"
+	"github.com/colemanserious/furby-gobot/sounds"
+)
 
 func main() {
-	cmd.Execute()
+	sounds.PlayFile("boing.wav")
+	//cmd.Execute()
 }
