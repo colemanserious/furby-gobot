@@ -22,13 +22,13 @@ package main
 
 import (
 	"github.com/colemanserious/furby-gobot/cmd"
-	"github.com/colemanserious/furby-gobot/sounds"
+	sounds "github.com/colemanserious/furby-gobot/pi_sounds"
 	"log"
 )
 
 func main() {
 	log.Println("Playing file...")
-	err := sounds.PlayWav("boing.wav")
+	err := sounds.PlayWav("pi_sounds/test/match2.wav")
 
 	if err == nil {
 		log.Println("Executing command...")
