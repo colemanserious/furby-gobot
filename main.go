@@ -1,4 +1,4 @@
-// Copyright © 2016 Tina Coleman <colemanserious@gmail.com>
+// Copyright © 2015 Tina Coleman <colemanserious@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,21 @@
 
 package main
 
-import "github.com/colemanserious/furby-gobot/cmd"
+import (
+	"github.com/colemanserious/furby-gobot/cmd"
+	"github.com/colemanserious/furby-gobot/sounds"
+	"log"
+)
 
 func main() {
-	cmd.Execute()
+	log.Println("Playing file...")
+	err := sounds.PlayWav("boing.wav")
+
+	if err == nil {
+		log.Println("Executing command...")
+		cmd.Execute()
+	} else {
+		log.Println("Unable to execute command - could not play sound.")
+	}
+
 }
