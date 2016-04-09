@@ -21,19 +21,15 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
+	sounds "github.com/colemanserious/furby-gobot/pi_sounds"
 	"github.com/spf13/cobra"
-
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/raspi"
-	"time"
 )
 
-// ledOnCmd represents the ledOn command
-var ledOnCmd = &cobra.Command{
-	Use:   "ledOn",
+// playSoundCmd represents the playSound command
+var playSoundCmd = &cobra.Command{
+	Use:   "playSound",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -42,42 +38,25 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ledOn called")
-
-		gbot := gobot.NewGobot()
-
-		r := raspi.NewRaspiAdaptor("raspi")
-		led := gpio.NewLedDriver(r, "led", "13")
-
-		work := func() {
-			gobot.Every(1*time.Second, func() {
-				led.Toggle()
-			})
+		
+		err := sounds.PlayWav(args[0])
+		if err != nil {
+			log.Println("Unable to execute command - could not play sound.")
 		}
-
-		robot := gobot.NewRobot("blinkBot",
-			[]gobot.Connection{r},
-			[]gobot.Device{led},
-			work,
-		)
-
-		gbot.AddRobot(robot)
-
-		gbot.Start()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(ledOnCmd)
+	RootCmd.AddCommand(playSoundCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// ledOnCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// playSoundCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// ledOnCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// playSoundCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 }

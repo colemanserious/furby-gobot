@@ -22,19 +22,9 @@ package main
 
 import (
 	"github.com/colemanserious/furby-gobot/cmd"
-	sounds "github.com/colemanserious/furby-gobot/pi_sounds"
-	"log"
 )
 
+
 func main() {
-	log.Println("Playing file...")
-	err := sounds.PlayWav("pi_sounds/test/match2.wav")
-
-	if err == nil {
-		log.Println("Executing command...")
-		cmd.Execute()
-	} else {
-		log.Println("Unable to execute command - could not play sound.")
-	}
-
+	cmd.Execute()
 }
