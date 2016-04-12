@@ -23,7 +23,7 @@ package cmd
 import (
 	"log"
 
-	sounds "github.com/colemanserious/furby-gobot/sounds"
+	sounds "github.com/colemanserious/furby-gobot/pi_sounds"
 	"github.com/spf13/cobra"
 )
 
@@ -38,8 +38,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		err := sounds.PlayWav("match2.wav")
+		
+		err := sounds.PlayWav(args[0])
 		if err != nil {
 			log.Println("Unable to execute command - could not play sound.")
 		}

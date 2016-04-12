@@ -24,7 +24,7 @@ import (
 	"github.com/colemanserious/furby-gobot/cmd"
 )
 
+
 func main() {
 	cmd.Execute()
-
 }
