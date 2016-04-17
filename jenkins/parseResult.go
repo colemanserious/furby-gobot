@@ -1,6 +1,9 @@
 package jenkins
 
-import ()
+import (
+	"fmt"
+	//	"log"
+)
 
 type JobOutcome struct {
 	State JobState
@@ -45,19 +48,58 @@ func (j JobState) String() string {
 	return "UNKNOWN!"
 }
 
+func findKey(key string, value interface{}, checkKey string) (string, bool) {
+	fmt.Printf("findKey for %v against checkKey %v\n", key, checkKey)
+	switch val := value.(type) {
+	case string:
+		return val, (key == checkKey)
+	case map[string]interface{}:
+		for newKey, newValue := range val {
+			foundValue, found := findKey(newKey, newValue, checkKey)
+			if found {
+				return foundValue, found
+			}
+		}
+	}
+	return "", false
+}
+
 func ParseJobState(params map[string]interface{}) []JobOutcome {
-	// iterate over map, get final result for each job.
-	var firstOutcome JobOutcome
-	firstOutcome.State = COMPLETED
-	firstOutcome.Name = "Test job"
 
 	// Example: non-compiling code: [1]JobOutcome != []JobOutcome.
 	// Size of array is included in its type.  Use slices instead
 	//outcomesArray := [...]JobOutcome{firstOutcome}
 	//return outcomesArray
 
-	jobStateMachine[firstOutcome.Name] = firstOutcome
+	var statusFound, nameFound bool
+	var statusValue, nameValue string
+
+	//statusFound = false
+	//nameFound = false
+
+	for key, value := range params {
+		if !statusFound {
+			statusValue, statusFound = findKey(key, value, "status")
+		}
+		if !nameFound {
+			nameValue, nameFound = findKey(key, value, "name")
+		}
+		if nameFound && statusFound {
+			fmt.Printf("name: %v, status: %v\n", nameValue, statusValue)
+			break
+		}
+	}
+
+	//resultName := params.name
+	//resultStatus := params.status
+
+	//log.Printf("Job name: %v, state: %v", resultName, resultStatus)
+
+	// check last state
+	//lastVal, ok := jobStateMachine[resultName]
+
+	//jobStateMachine[firstOutcome.Name] = firstOutcome
 	outcomesSlice := make([]JobOutcome, 1)
-	outcomesSlice[0] = firstOutcome
+	//outcomesSlice[0] = firstOutcome
 	return outcomesSlice
 }
