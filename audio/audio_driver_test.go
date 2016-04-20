@@ -7,7 +7,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-func TestD_audioDriver(t *testing.T) {
+func TestAudioDriver(t *testing.T) {
 	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev")
 
 	gobot.Assert(t, d.Name(), "dev")
@@ -43,4 +43,6 @@ func TestD_audioDriver(t *testing.T) {
 		t.Errorf("Hello Event should not publish after Halt")
 	case <-time.After(600 * time.Millisecond):
 	}
+
+	gobot.Assert(t, len(d.Sound("foo.wav")), 0)
 }

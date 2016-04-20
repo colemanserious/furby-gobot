@@ -54,11 +54,9 @@ to quickly create a Cobra application.`,
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds")
 
 		work := func() {
-			gobot.Every(1*time.Second, func() {
+			gobot.Every(3*time.Second, func() {
 				led.Toggle()
-			})
-			gobot.Every(5*time.Second, func() {
-				audioDriver.Sound("/resources/foo.wav")
+				audioDriver.Sound("foo.wav")
 			})
 		}
 

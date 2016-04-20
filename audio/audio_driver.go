@@ -2,7 +2,6 @@ package audio
 
 import (
 	"time"
-
 	"github.com/hybridgroup/gobot"
 )
 
@@ -45,7 +44,7 @@ func (d *AudioDriver) Connection() gobot.Connection {
 }
 
 func (d *AudioDriver) Sound(fileName string) []error {
-	return d.Sound(fileName)
+	return d.Connection().(*AudioAdaptor).Sound(fileName)
 }
 
 func (d *AudioDriver) adaptor() *AudioAdaptor {
