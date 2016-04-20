@@ -44,6 +44,10 @@ func (d *AudioDriver) Connection() gobot.Connection {
 	return d.connection
 }
 
+func (d *AudioDriver) Sound(fileName string) []error {
+	return d.Sound(fileName)
+}
+
 func (d *AudioDriver) adaptor() *AudioAdaptor {
 	return d.Connection().(*AudioAdaptor)
 }

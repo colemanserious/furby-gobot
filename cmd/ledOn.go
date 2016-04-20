@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/colemanserious/furby-gobot/audio"
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
@@ -47,17 +48,23 @@ to quickly create a Cobra application.`,
 		gbot := gobot.NewGobot()
 
 		r := raspi.NewRaspiAdaptor("raspi")
+		audioAdaptor := audio.NewAudioAdaptor("sound")
+
 		led := gpio.NewLedDriver(r, "led", "13")
+		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds")
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
 				led.Toggle()
 			})
+			gobot.Every(5*time.Second, func() {
+				audioDriver.Sound("/resources/foo.wav")
+			})
 		}
 
 		robot := gobot.NewRobot("blinkBot",
-			[]gobot.Connection{r},
-			[]gobot.Device{led},
+			[]gobot.Connection{r, audioAdaptor},
+			[]gobot.Device{led, audioDriver},
 			work,
 		)
 
