@@ -22,7 +22,7 @@ package cmd
 
 import (
 	"fmt"
-	jenkinsParse "github.com/colemanserious/furby-gobot/jenkins"
+	jenkinsParse "github.com/colemanserious/furby-gobot/jenkinsconnect"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/spf13/cobra"
