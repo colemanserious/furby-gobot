@@ -59,7 +59,7 @@ to quickly create a Cobra application.`,
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
 		work := func() {
-			gobot.Every(1*time.Second, func() {
+			gobot.Every(3*time.Second, func() {
 				led.Toggle()
 			})
 			gobot.Every(5*time.Second, func() {
