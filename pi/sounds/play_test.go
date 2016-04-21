@@ -1,4 +1,4 @@
-package pi_sounds
+package sounds
 
 import (
 	"testing"
@@ -15,7 +15,7 @@ func TestEmptyFileName(t *testing.T) {
 
 func TestRealFileName(t *testing.T) {
 
-	err := PlayWav("test/match2.wav")
+	err := PlayWav("../test/match2.wav")
 	if err != nil {
 		t.Error("Should have been able to play file.", err)
 	}

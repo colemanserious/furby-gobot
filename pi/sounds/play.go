@@ -1,4 +1,4 @@
-package pi_sounds
+package sounds
 
 import (
 	"errors"

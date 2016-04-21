@@ -18,12 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/*
- Package cmd provides the commands for the console application for furby-gobot
-
- Each command gets a use, a short description, and a long description.
-
-*/
+// Package cmd provides the commands for the console application for furby-gobot
+// Each command gets a use, a short description, and a long description.
+// Makes use of cobra to create command hierarchies, flags, etc.
 package cmd
 
 import (
@@ -36,7 +33,7 @@ import (
 
 var cfgFile string
 
-// This represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "furby-gobot",
 	Short: "A brief description of your application",

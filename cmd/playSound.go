@@ -23,7 +23,7 @@ package cmd
 import (
 	"log"
 
-	sounds "github.com/colemanserious/furby-gobot/pi_sounds"
+	sounds "github.com/colemanserious/furby-gobot/pi/sounds"
 	"github.com/spf13/cobra"
 )
 
