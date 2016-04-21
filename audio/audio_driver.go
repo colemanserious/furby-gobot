@@ -1,8 +1,8 @@
 package audio
 
 import (
-	"time"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 var _ gobot.Driver = (*AudioDriver)(nil)

@@ -38,7 +38,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		
+
 		err := sounds.PlayWav(args[0])
 		if err != nil {
 			log.Println("Unable to execute command - could not play sound.")
