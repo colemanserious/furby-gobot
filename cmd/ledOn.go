@@ -24,6 +24,8 @@ import (
 	"fmt"
 
 	"github.com/colemanserious/furby-gobot/audio"
+	"github.com/colemanserious/furby-gobot/jenkinsconnect"
+	"github.com/hybridgroup/gobot/api"
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
@@ -49,12 +51,15 @@ to quickly create a Cobra application.`,
 		fmt.Println("ledOn called")
 
 		gbot := gobot.NewGobot()
+		api.NewAPI(gbot).Start()
 
 		r := raspi.NewRaspiAdaptor("raspi")
 		audioAdaptor := audio.NewAudioAdaptor("sound")
+		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
 
 		led := gpio.NewLedDriver(r, "led", "13")
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds")
+		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
 		screen := i2c.NewGroveLcdDriver(r, "screen")
 	        work := func() {
