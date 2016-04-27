@@ -1,6 +1,7 @@
 package sounds
 
 import (
+	"os/exec"
 	"testing"
 )
 
@@ -15,7 +16,12 @@ func TestEmptyFileName(t *testing.T) {
 
 func TestRealFileName(t *testing.T) {
 
-	err := PlayWav("../test/match2.wav")
+	_, err := exec.LookPath("aplayer")
+	if err != nil {
+		t.Skip("Unable to execute command to play file.")
+		return
+	}
+	err = PlayWav("../test/match2.wav")
 	if err != nil {
 		t.Error("Should have been able to play file.", err)
 	}

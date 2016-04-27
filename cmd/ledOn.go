@@ -33,8 +33,8 @@ import (
 	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 
-	"time"
 	"log"
+	"time"
 )
 
 // ledOnCmd represents the ledOn command
@@ -62,7 +62,7 @@ to quickly create a Cobra application.`,
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
 		screen := i2c.NewGroveLcdDriver(r, "screen")
-	        work := func() {
+		work := func() {
 
 			screen.Clear()
 			screen.Home()
@@ -92,7 +92,7 @@ to quickly create a Cobra application.`,
 
 		robot := gobot.NewRobot("blinkBot",
 			[]gobot.Connection{r, audioAdaptor},
-			[]gobot.Device{led, audioDriver, screen},
+			[]gobot.Device{led, audioDriver, screen, jenkinsDriver},
 			work,
 		)
 
