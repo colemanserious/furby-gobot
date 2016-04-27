@@ -44,8 +44,7 @@ func NewJenkinsconnectDriver(a *JenkinsconnectAdaptor, name string) *Jenkinsconn
 	})
 
 	j.AddCommand(Hello, func(params map[string]interface{}) interface{} {
-		//	return j.Hello()
-		return nil
+		return j.Hello()
 	})
 
 	return j
@@ -64,7 +63,7 @@ func (j *JenkinsconnectDriver) adaptor() *JenkinsconnectAdaptor {
 func (j *JenkinsconnectDriver) Start() []error {
 	go func() {
 		for {
-			//gobot.Publish(j.Event(Hello), j.Hello())
+			gobot.Publish(j.Event(Hello), j.Hello())
 
 			select {
 			case <-time.After(j.interval):
@@ -74,6 +73,10 @@ func (j *JenkinsconnectDriver) Start() []error {
 		}
 	}()
 	return nil
+}
+
+func (j *JenkinsconnectDriver) Hello() string {
+	return Hello
 }
 
 func (j *JenkinsconnectDriver) Halt() []error {

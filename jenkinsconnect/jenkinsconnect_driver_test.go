@@ -13,9 +13,6 @@ func TestJenkinsconnectDriver(t *testing.T) {
 	gobot.Assert(t, d.Name(), "dev")
 	gobot.Assert(t, d.Connection().Name(), "conn")
 
-	ret := d.Command(Hello)(nil)
-	gobot.Assert(t, ret.(string), "hello from dev!")
-
 	gobot.Assert(t, len(d.Start()), 0)
 
 	<-time.After(d.interval)

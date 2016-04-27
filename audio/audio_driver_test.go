@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"os/exec"
 	"testing"
 	"time"
 
@@ -44,5 +45,10 @@ func TestAudioDriver(t *testing.T) {
 	case <-time.After(600 * time.Millisecond):
 	}
 
-	gobot.Assert(t, len(d.Sound("foo.wav")), 0)
+	_, err := exec.LookPath("aplayer")
+	numErrsForTest := 0
+	if err != nil {
+		numErrsForTest = 1
+	}
+	gobot.Assert(t, len(d.Sound("foo.wav")), numErrsForTest)
 }

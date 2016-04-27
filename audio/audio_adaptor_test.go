@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"os/exec"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -13,7 +14,12 @@ func TestAudioAdaptor(t *testing.T) {
 
 	gobot.Assert(t, len(a.Connect()), 0)
 
-	gobot.Assert(t, len(a.Sound("foo.wav")), 0)
+	_, err := exec.LookPath("aplayer")
+	numErrsForTest := 0
+	if err != nil {
+		numErrsForTest = 1
+	}
+	gobot.Assert(t, len(a.Sound("foo.wav")), numErrsForTest)
 
 	gobot.Assert(t, len(a.Connect()), 0)
 
