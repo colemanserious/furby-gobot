@@ -3,7 +3,6 @@ package jenkinsconnect
 import (
 	"fmt"
 	//	"log"
-	"strconv"
 )
 
 type JobOutcome struct {
@@ -14,36 +13,43 @@ type JobOutcome struct {
 type JobState int
 
 const (
-	_                  = iota
-	STARTED   JobState = 0
-	COMPLETED JobState = 1
-	FINALIZED JobState = 2
-	FAILED    JobState = 3
-	PASSING   JobState = 4
+	UNKNOWN JobState = iota
+	STARTED
+	COMPLETED
+	FINALIZED
+	FAILED
+	SUCCESS
+	ABORTED
+	UNSTABLE
 )
 
-var (
-	jobStateMachine map[string]JobOutcome
-)
-
-func init() {
-	jobStateMachine = make(map[string]JobOutcome)
+var jobStateValues = []string{
+	UNKNOWN:   "UNKNOWN",
+	STARTED:   "STARTED",
+	COMPLETED: "COMPLETED",
+	FINALIZED: "FINALIZED",
+	FAILED:    "FAILURE",
+	SUCCESS:   "SUCCESS",
+	ABORTED:   "ABORTED",
+	UNSTABLE:  "UNSTABLE",
 }
 
 func (j JobState) String() string {
-	switch {
-	case j == FAILED:
-		return "FAILED"
-	case j == FINALIZED:
-		return "FINALIZED"
-	case j == COMPLETED:
-		return "COMPLETED"
-	case j == STARTED:
-		return "STARTED"
-	case j == PASSING:
-		return "PASSING"
+	if j <= 0 || int(j) >= len(jobStateValues) {
+		return "unknown"
 	}
-	return "UNKNOWN!"
+	return jobStateValues[j]
+}
+
+func getJobState(s string) JobState {
+
+	for index, _ := range jobStateValues {
+		if s == jobStateValues[index] {
+			return JobState(index)
+		}
+	}
+
+	return UNKNOWN
 }
 
 func findKey(key string, value interface{}, checkKey string) (string, bool) {
@@ -69,13 +75,23 @@ func ParseJobState(params map[string]interface{}) JobOutcome {
 	//outcomesArray := [...]JobOutcome{firstOutcome}
 	//return outcomesArray
 
-	fmt.Println("Finding JobState...")
-	var statusFound, nameFound bool
-	var statusValue, nameValue string
+	fmt.Printf("Finding JobState... %v\n", params)
+	var statusFound, nameFound, phaseFound bool
+	var statusValue, nameValue, phaseValue string
 
-	var outcome JobOutcome
+	var outcome, blankOutcome JobOutcome
 
 	for key, value := range params {
+		if !phaseFound {
+			phaseValue, phaseFound = findKey(key, value, "phase")
+			if phaseFound {
+				// we get 3 entries, with phases STARTED, COMPLETED, and FINALIZED.
+				//  Only the FINALIZED one will give us real info
+				if phaseValue != "FINALIZED" {
+					return blankOutcome
+				}
+			}
+		}
 		if !statusFound {
 			statusValue, statusFound = findKey(key, value, "status")
 		}
@@ -85,9 +101,7 @@ func ParseJobState(params map[string]interface{}) JobOutcome {
 		if nameFound && statusFound {
 			fmt.Printf("name: %v, status: %v\n", nameValue, statusValue)
 
-			// todo: This is converting "1" to 1, not FAILED to 3
-			statusInt, _ := strconv.Atoi(statusValue)
-			outcome.State = JobState(statusInt)
+			outcome.State = getJobState(statusValue)
 			outcome.Name = nameValue
 			break
 		}
