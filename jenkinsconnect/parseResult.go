@@ -13,39 +13,43 @@ type JobOutcome struct {
 type JobState int
 
 const (
-	_                      = iota
-	STARTED       JobState = 0
-	COMPLETED     JobState = 1
-	FINALIZED     JobState = 2
-	FAILED        JobState = 3
-	PASSING       JobState = 4
-	STILL_FAILING JobState = 14
+	UNKNOWN JobState = iota
+	STARTED
+	COMPLETED
+	FINALIZED
+	FAILED
+	SUCCESS
+	ABORTED
+	UNSTABLE
 )
 
-var (
-	jobStateMachine map[string]JobOutcome
-)
-
-func init() {
-	jobStateMachine = make(map[string]JobOutcome)
+var jobStateValues = []string{
+	UNKNOWN:   "UNKNOWN",
+	STARTED:   "STARTED",
+	COMPLETED: "COMPLETED",
+	FINALIZED: "FINALIZED",
+	FAILED:    "FAILURE",
+	SUCCESS:   "SUCCESS",
+	ABORTED:   "ABORTED",
+	UNSTABLE:  "UNSTABLE",
 }
 
 func (j JobState) String() string {
-	switch {
-	case j == FAILED:
-		return "FAILED"
-	case j == FINALIZED:
-		return "FINALIZED"
-	case j == COMPLETED:
-		return "COMPLETED"
-	case j == STARTED:
-		return "STARTED"
-	case j == PASSING:
-		return "PASSING"
-	case j == STILL_FAILING:
-		return "BONEHEAD FAILING"
+	if j <= 0 || int(j) >= len(jobStateValues) {
+		return "unknown"
 	}
-	return "UNKNOWN!"
+	return jobStateValues[j]
+}
+
+func getJobState(s string) JobState {
+
+	for index, _ := range jobStateValues {
+		if s == jobStateValues[index] {
+			return JobState(index)
+		}
+	}
+
+	return UNKNOWN
 }
 
 func findKey(key string, value interface{}, checkKey string) (string, bool) {
@@ -64,20 +68,30 @@ func findKey(key string, value interface{}, checkKey string) (string, bool) {
 	return "", false
 }
 
-func ParseJobState(params map[string]interface{}) []JobOutcome {
+func ParseJobState(params map[string]interface{}) JobOutcome {
 
 	// Example: non-compiling code: [1]JobOutcome != []JobOutcome.
 	// Size of array is included in its type.  Use slices instead
 	//outcomesArray := [...]JobOutcome{firstOutcome}
 	//return outcomesArray
 
-	var statusFound, nameFound bool
-	var statusValue, nameValue string
+	fmt.Printf("Finding JobState... %v\n", params)
+	var statusFound, nameFound, phaseFound bool
+	var statusValue, nameValue, phaseValue string
 
-	//statusFound = false
-	//nameFound = false
+	var outcome, blankOutcome JobOutcome
 
 	for key, value := range params {
+		if !phaseFound {
+			phaseValue, phaseFound = findKey(key, value, "phase")
+			if phaseFound {
+				// we get 3 entries, with phases STARTED, COMPLETED, and FINALIZED.
+				//  Only the FINALIZED one will give us real info
+				if phaseValue != "FINALIZED" {
+					return blankOutcome
+				}
+			}
+		}
 		if !statusFound {
 			statusValue, statusFound = findKey(key, value, "status")
 		}
@@ -86,20 +100,12 @@ func ParseJobState(params map[string]interface{}) []JobOutcome {
 		}
 		if nameFound && statusFound {
 			fmt.Printf("name: %v, status: %v\n", nameValue, statusValue)
+
+			outcome.State = getJobState(statusValue)
+			outcome.Name = nameValue
 			break
 		}
 	}
 
-	//resultName := params.name
-	//resultStatus := params.status
-
-	//log.Printf("Job name: %v, state: %v", resultName, resultStatus)
-
-	// check last state
-	//lastVal, ok := jobStateMachine[resultName]
-
-	//jobStateMachine[firstOutcome.Name] = firstOutcome
-	outcomesSlice := make([]JobOutcome, 1)
-	//outcomesSlice[0] = firstOutcome
-	return outcomesSlice
+	return outcome
 }
