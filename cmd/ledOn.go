@@ -90,7 +90,7 @@ to quickly create a Cobra application.`,
 			//screen.SetRGB(0, 0, 255)
 		}
 
-		robot := gobot.NewRobot("blinkBot",
+		robot := gobot.NewRobot("furbyBot",
 			[]gobot.Connection{r, audioAdaptor},
 			[]gobot.Device{led, audioDriver, screen, jenkinsDriver},
 			work,

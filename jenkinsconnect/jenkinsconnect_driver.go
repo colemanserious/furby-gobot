@@ -1,50 +1,58 @@
 package jenkinsconnect
 
 import (
-	//"fmt"
-	"log"
-	"time"
-
+	"fmt"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 var _ gobot.Driver = (*JenkinsconnectDriver)(nil)
 
-const Hello string = "hello"
+const JobResult string = "jobResult"
 
 type JenkinsconnectDriver struct {
 	name       string
 	connection gobot.Connection
-	interval   time.Duration
 	halt       chan bool
 	gobot.Eventer
 	gobot.Commander
 }
 
+type JobOutcomeSnapshot struct {
+	Outcome JobOutcome
+	RanAt   time.Time
+}
+
+var jobStates = map[string]JobOutcomeSnapshot{}
+
 func NewJenkinsconnectDriver(a *JenkinsconnectAdaptor, name string) *JenkinsconnectDriver {
 	j := &JenkinsconnectDriver{
 		name:       name,
 		connection: a,
-		interval:   500 * time.Millisecond,
-		halt:       make(chan bool, 0),
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}
 
-	j.AddEvent(Hello)
+	j.AddEvent(JobResult)
 
 	j.AddCommand("ParseResults", func(params map[string]interface{}) interface{} {
-		log.Println("Received result from Jenkins.")
-		//log.Printf("Received result from Jenkins... %v", params)
-		result := ParseJobState(params)
-		//log.Printf("Result received: %v", result[0].State)
-		return result
-		//return fmt.Sprintf("Parsed results:  %v", result[0])
-		//return fmt.Sprintf("Parsing Jenkins results: %v", jenkins.Name)
-	})
+		var snapshot JobOutcomeSnapshot
 
-	j.AddCommand(Hello, func(params map[string]interface{}) interface{} {
-		return j.Hello()
+		result := ParseJobState(params)
+		if (JobOutcome{}) != result {
+			fmt.Printf("Result: %v\n", result)
+			lastOutcome, ok := jobStates[result.Name]
+			if ok {
+				fmt.Printf("Last outcome: %v\n", lastOutcome)
+			}
+
+			snapshot.Outcome = result
+			snapshot.RanAt = time.Now()
+			jobStates[result.Name] = snapshot
+			gobot.Publish(j.Event(JobResult), result)
+		}
+
+		return result
 	})
 
 	return j
@@ -61,25 +69,9 @@ func (j *JenkinsconnectDriver) adaptor() *JenkinsconnectAdaptor {
 }
 
 func (j *JenkinsconnectDriver) Start() []error {
-	go func() {
-		for {
-			gobot.Publish(j.Event(Hello), j.Hello())
-
-			select {
-			case <-time.After(j.interval):
-			case <-j.halt:
-				return
-			}
-		}
-	}()
 	return nil
 }
 
-func (j *JenkinsconnectDriver) Hello() string {
-	return Hello
-}
-
 func (j *JenkinsconnectDriver) Halt() []error {
-	j.halt <- true
 	return nil
 }

@@ -3,6 +3,7 @@ package jenkinsconnect
 import (
 	"fmt"
 	//	"log"
+	"strconv"
 )
 
 type JobOutcome struct {
@@ -13,13 +14,12 @@ type JobOutcome struct {
 type JobState int
 
 const (
-	_                      = iota
-	STARTED       JobState = 0
-	COMPLETED     JobState = 1
-	FINALIZED     JobState = 2
-	FAILED        JobState = 3
-	PASSING       JobState = 4
-	STILL_FAILING JobState = 14
+	_                  = iota
+	STARTED   JobState = 0
+	COMPLETED JobState = 1
+	FINALIZED JobState = 2
+	FAILED    JobState = 3
+	PASSING   JobState = 4
 )
 
 var (
@@ -42,8 +42,6 @@ func (j JobState) String() string {
 		return "STARTED"
 	case j == PASSING:
 		return "PASSING"
-	case j == STILL_FAILING:
-		return "BONEHEAD FAILING"
 	}
 	return "UNKNOWN!"
 }
@@ -64,18 +62,18 @@ func findKey(key string, value interface{}, checkKey string) (string, bool) {
 	return "", false
 }
 
-func ParseJobState(params map[string]interface{}) []JobOutcome {
+func ParseJobState(params map[string]interface{}) JobOutcome {
 
 	// Example: non-compiling code: [1]JobOutcome != []JobOutcome.
 	// Size of array is included in its type.  Use slices instead
 	//outcomesArray := [...]JobOutcome{firstOutcome}
 	//return outcomesArray
 
+	fmt.Println("Finding JobState...")
 	var statusFound, nameFound bool
 	var statusValue, nameValue string
 
-	//statusFound = false
-	//nameFound = false
+	var outcome JobOutcome
 
 	for key, value := range params {
 		if !statusFound {
@@ -86,20 +84,14 @@ func ParseJobState(params map[string]interface{}) []JobOutcome {
 		}
 		if nameFound && statusFound {
 			fmt.Printf("name: %v, status: %v\n", nameValue, statusValue)
+
+			// todo: This is converting "1" to 1, not FAILED to 3
+			statusInt, _ := strconv.Atoi(statusValue)
+			outcome.State = JobState(statusInt)
+			outcome.Name = nameValue
 			break
 		}
 	}
 
-	//resultName := params.name
-	//resultStatus := params.status
-
-	//log.Printf("Job name: %v, state: %v", resultName, resultStatus)
-
-	// check last state
-	//lastVal, ok := jobStateMachine[resultName]
-
-	//jobStateMachine[firstOutcome.Name] = firstOutcome
-	outcomesSlice := make([]JobOutcome, 1)
-	//outcomesSlice[0] = firstOutcome
-	return outcomesSlice
+	return outcome
 }

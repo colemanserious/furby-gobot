@@ -22,11 +22,11 @@ package cmd
 
 import (
 	"fmt"
-	jenkinsParse "github.com/colemanserious/furby-gobot/jenkinsconnect"
+	"github.com/colemanserious/furby-gobot/jenkinsconnect"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
+	"github.com/hybridgroup/gobot/platforms/raspi"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // listenJenkinsCmd represents the listenJenkins command
@@ -40,17 +40,27 @@ var listenJenkinsCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		gbot := gobot.NewGobot()
-		a := api.NewAPI(gbot)
-		//a.Debug()
-		a.Start()
+		api.NewAPI(gbot).Start()
 
-		jenkins := gbot.AddRobot(gobot.NewRobot("jenkins"))
-		jenkins.AddCommand("parseResult", func(params map[string]interface{}) interface{} {
-			log.Printf("Received result from Jenkins... %v", params)
-			result := jenkinsParse.ParseJobState(params)
-			log.Printf("Result received: %v", result[0].State)
-			return fmt.Sprintf("Parsing Jenkins results: %v", jenkins.Name)
-		})
+		r := raspi.NewRaspiAdaptor("raspi")
+		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
+
+		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
+
+		work := func() {
+			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
+				fmt.Println("Received jobResult event")
+			})
+
+		}
+
+		robot := gobot.NewRobot("furbyBot",
+			[]gobot.Connection{r},
+			[]gobot.Device{jenkinsDriver},
+			work,
+		)
+
+		gbot.AddRobot(robot)
 		gbot.Start()
 
 	},
