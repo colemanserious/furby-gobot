@@ -7,8 +7,6 @@ import (
 
 var _ gobot.Driver = (*AudioDriver)(nil)
 
-const Hello string = "hello"
-
 type AudioDriver struct {
 	name       string
 	connection gobot.Connection
@@ -28,12 +26,6 @@ func NewAudioDriver(a *AudioAdaptor, name string) *AudioDriver {
 		Commander:  gobot.NewCommander(),
 	}
 
-	d.AddEvent(Hello)
-
-	d.AddCommand(Hello, func(params map[string]interface{}) interface{} {
-		return d.Hello()
-	})
-
 	return d
 }
 
@@ -51,26 +43,10 @@ func (d *AudioDriver) adaptor() *AudioAdaptor {
 	return d.Connection().(*AudioAdaptor)
 }
 
-func (d *AudioDriver) Hello() string {
-	return "hello from " + d.Name() + "!"
+func (d *AudioDriver) Start() (err []error) {
+	return
 }
 
-func (d *AudioDriver) Start() []error {
-	go func() {
-		for {
-			gobot.Publish(d.Event(Hello), d.Hello())
-
-			select {
-			case <-time.After(d.interval):
-			case <-d.halt:
-				return
-			}
-		}
-	}()
-	return nil
-}
-
-func (d *AudioDriver) Halt() []error {
-	d.halt <- true
-	return nil
+func (d *AudioDriver) Halt() (err []error) {
+	return
 }
