@@ -24,12 +24,12 @@ import (
 	"fmt"
 
 	"github.com/colemanserious/furby-gobot/audio"
+	"github.com/colemanserious/furby-gobot/furby"
 	"github.com/colemanserious/furby-gobot/jenkinsconnect"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 
@@ -37,9 +37,9 @@ import (
 	"time"
 )
 
-// ledOnCmd represents the ledOn command
-var ledOnCmd = &cobra.Command{
-	Use:   "ledOn",
+// furbyBotCmd represents the furbyBot command
+var furbyBotCmd = &cobra.Command{
+	Use:   "furbyBot",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -48,7 +48,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ledOn called")
+		fmt.Println("furbyBot called")
 
 		gbot := gobot.NewGobot()
 		api.NewAPI(gbot).Start()
@@ -57,8 +57,10 @@ to quickly create a Cobra application.`,
 		audioAdaptor := audio.NewAudioAdaptor("sound")
 		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
 
-		led := gpio.NewLedDriver(r, "led", "13")
-		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", nil)
+		// Set up asynchronous channel - if we get more than 3 sounds being played in a row, something's up
+		csoundFiles := make(chan string, 3)
+		furby := furby.NewFurbyDriver(r, "furby", "13", csoundFiles)
+		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", csoundFiles)
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
 		screen := i2c.NewGroveLcdDriver(r, "screen")
@@ -70,7 +72,7 @@ to quickly create a Cobra application.`,
 			//screen.SetRGB(255, 0, 0)
 
 			gobot.Every(5*time.Second, func() {
-				led.Toggle()
+				furby.Toggle()
 				audioDriver.Sound("resources/foo.wav")
 				if err := screen.Write("Writing, writing..."); err != nil {
 					log.Fatal(err)
@@ -92,7 +94,7 @@ to quickly create a Cobra application.`,
 
 		robot := gobot.NewRobot("furbyBot",
 			[]gobot.Connection{r, audioAdaptor},
-			[]gobot.Device{led, audioDriver, screen, jenkinsDriver},
+			[]gobot.Device{furby, audioDriver, screen, jenkinsDriver},
 			work,
 		)
 
@@ -103,7 +105,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	RootCmd.AddCommand(ledOnCmd)
+	RootCmd.AddCommand(furbyBotCmd)
 
 	// Here you will define your flags and configuration settings.
 

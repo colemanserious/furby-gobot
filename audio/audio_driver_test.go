@@ -8,7 +8,7 @@ import (
 )
 
 func TestAudioDriver(t *testing.T) {
-	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev")
+	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", nil)
 
 	gobot.Assert(t, d.Name(), "dev")
 	gobot.Assert(t, d.Connection().Name(), "conn")
