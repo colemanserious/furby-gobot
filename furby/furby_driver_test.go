@@ -67,5 +67,5 @@ func TestFurbyDriverToggle(t *testing.T) {
 func TestListCommands(t *testing.T) {
 	d := initTestFurbyDriver(newGpioTestAdaptor("adaptor"), nil)
 	commands := d.ListCommands()
-	gobot.Assert(t, len(commands), 2)
+	gobot.Assert(t, len(commands), 4)
 }

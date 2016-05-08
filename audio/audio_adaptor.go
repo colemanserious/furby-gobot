@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"os"
 	"errors"
 	"github.com/hybridgroup/gobot"
 	"log"
@@ -33,6 +34,13 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 	if fileName == "" {
 		log.Println("Require filename for WAV file.")
 		errorsList = append(errorsList, errors.New("Requires filename for WAV file."))
+		return errorsList
+	}
+
+	_, err = os.Open(fileName)
+	if err != nil {
+		log.Println(err)
+		errorsList = append(errorsList, err)
 		return errorsList
 	}
 

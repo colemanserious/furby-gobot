@@ -17,10 +17,10 @@ func TestAudioDriver(t *testing.T) {
 
 	gobot.Assert(t, len(d.Halt()), 0)
 
-	_, err := exec.LookPath("aplayer")
+	_, err := exec.LookPath("aplay")
 	numErrsForTest := 0
 	if err != nil {
 		numErrsForTest = 1
 	}
-	gobot.Assert(t, len(d.Sound("foo.wav")), numErrsForTest)
+	gobot.Assert(t, len(d.Sound("../resources/foo.wav")), numErrsForTest)
 }

@@ -20,7 +20,9 @@ func TestFurbyKnownCommands(t *testing.T) {
 
 	// test output should have messages indicating that each of these has a corollary sound played
 	initTestInfrastructure()
-	err := d.ExecuteCommand("whee")
+	err := d.ExecuteCommand("fart")
+	gobot.Assert(t, err, nil)
+	err = d.ExecuteCommand("laugh")
 	gobot.Assert(t, err, nil)
 	err = d.ExecuteCommand("burp")
 	gobot.Assert(t, err, nil)

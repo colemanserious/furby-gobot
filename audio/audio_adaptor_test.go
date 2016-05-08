@@ -14,12 +14,12 @@ func TestAudioAdaptor(t *testing.T) {
 
 	gobot.Assert(t, len(a.Connect()), 0)
 
-	_, err := exec.LookPath("aplayer")
+	_, err := exec.LookPath("aplay")
 	numErrsForTest := 0
 	if err != nil {
 		numErrsForTest = 1
 	}
-	gobot.Assert(t, len(a.Sound("foo.wav")), numErrsForTest)
+	gobot.Assert(t, len(a.Sound("../resources/foo.wav")), numErrsForTest)
 
 	gobot.Assert(t, len(a.Connect()), 0)
 
