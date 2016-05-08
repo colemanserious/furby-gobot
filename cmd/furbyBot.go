@@ -30,11 +30,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	//"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 
-	"log"
 	"time"
+	//"log"
 )
 
 // furbyBotCmd represents the furbyBot command
@@ -55,46 +55,57 @@ to quickly create a Cobra application.`,
 
 		r := raspi.NewRaspiAdaptor("raspi")
 		audioAdaptor := audio.NewAudioAdaptor("sound")
-		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
+		jenkinsAdaptor := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
 
 		// Set up asynchronous channel - if we get more than 3 sounds being played in a row, something's up
 		csoundFiles := make(chan string, 3)
 		furby := furby.NewFurbyDriver(r, "furby", "13", csoundFiles)
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", csoundFiles)
-		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
+		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsAdaptor, "jenkins-command")
 
-		screen := i2c.NewGroveLcdDriver(r, "screen")
+		//screen := i2c.NewGroveLcdDriver(r, "screen")
 		work := func() {
 
-			screen.Clear()
-			screen.Home()
+			//screen.Clear()
+			//screen.Home()
 
 			//screen.SetRGB(255, 0, 0)
-
-			gobot.Every(5*time.Second, func() {
-				furby.Toggle()
-				audioDriver.Sound("resources/foo.wav")
-				if err := screen.Write("Writing, writing..."); err != nil {
-					log.Fatal(err)
+			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
+				jobResult := data.(jenkinsconnect.JobOutcome)
+				switch jobResult.State {
+				case jenkinsconnect.SUCCESS:
+					furby.ExecuteCommand("laugh")
+				case jenkinsconnect.FAILED:
+					furby.ExecuteCommand("fart")
+				default:
 				}
-
-				screen.SetRGB(0, 255, 0)
-				// set a custom character in the first position
-				screen.SetCustomChar(0, i2c.CustomLCDChars["smiley"])
-				// add the custom character at the end of the string
-				screen.Write("goodbye\nhave a nice day " + string(byte(0)))
-				gobot.Every(500*time.Millisecond, func() {
-					screen.Scroll(false)
-				})
 			})
 
+			//gobot.every(5*time.second, func() {
+			//	furby.toggle()
+			//	audiodriver.sound("resources/foo.wav")
+			//	if err := screen.write("writing, writing..."); err != nil {
+			//		log.fatal(err)
+			//	}
+
+			//	screen.setrgb(0, 255, 0)
+			//	// set a custom character in the first position
+			//	screen.setcustomchar(0, i2c.customlcdchars["smiley"])
+			//	// add the custom character at the end of the string
+			//	screen.write("goodbye\nhave a nice day " + string(byte(0)))
+			//	gobot.every(500*time.millisecond, func() {
+			//		screen.scroll(false)
+			//	})
+			//})
+
 			<-time.After(1 * time.Second)
-			//screen.SetRGB(0, 0, 255)
+			//screen.setrgb(0, 0, 255)
 		}
 
 		robot := gobot.NewRobot("furbyBot",
 			[]gobot.Connection{r, audioAdaptor},
-			[]gobot.Device{furby, audioDriver, screen, jenkinsDriver},
+			//[]gobot.Device{furby, audioDriver, screen, jenkinsDriver},
+			[]gobot.Device{furby, audioDriver, jenkinsDriver},
 			work,
 		)
 

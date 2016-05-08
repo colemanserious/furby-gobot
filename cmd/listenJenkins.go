@@ -21,7 +21,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/colemanserious/furby-gobot/jenkinsconnect"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
@@ -49,7 +48,11 @@ var listenJenkinsCmd = &cobra.Command{
 
 		work := func() {
 			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
-				fmt.Println("Received jobResult event")
+				jobResult := data.(jenkinsconnect.JobOutcome)
+				switch jobResult.State {
+				case jenkinsconnect.SUCCESS:
+				}
+
 			})
 
 		}

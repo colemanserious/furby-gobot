@@ -1,23 +1,23 @@
 package furby
 
 import (
-	"os"
 	"fmt"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
+	"os"
 	"strings"
 )
 
 var _ gobot.Driver = (*FurbyDriver)(nil)
 
-var resourceRoot string 
+var resourceRoot string
 
 // Map command name to file name for command
-//  Three digits correspond to code from Hacksby library - see Command.pm 
+//  Three digits correspond to code from Hacksby library - see Command.pm
 var commands = map[string]string{
-	"burp": "864-burp.wav",
-	"laugh": "863-laugh.wav",
-	"fart": "865-fart.wav",
+	"burp":    "864-burp.wav",
+	"laugh":   "863-laugh.wav",
+	"fart":    "865-fart.wav",
 	"whisper": "719-whisper.wav",
 }
 
@@ -26,8 +26,15 @@ var commandList = []string{}
 func init() {
 	// Prepend for all files to get full location
 	//  Should be from execution path of binary (base)
+	//  Note: dealing with '..' for case of tests...
 	cwd, _ := os.Getwd()
-	resourceRoot = cwd + "/../resources/"
+	fmt.Println("Current working directory: " + cwd)
+	if strings.HasSuffix(cwd, "furby-gobot") {
+		resourceRoot = cwd + "/resources/"
+	} else {
+		resourceRoot = cwd + "/../resources/"
+	}
+
 	for k, v := range commands {
 		commandList = append(commandList, k)
 		commands[k] = strings.Join([]string{resourceRoot, v}, "")
