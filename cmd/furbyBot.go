@@ -70,36 +70,25 @@ to quickly create a Cobra application.`,
 			//screen.Home()
 
 			//screen.SetRGB(255, 0, 0)
+			//	if err := screen.write("writing, writing..."); err != nil {
+			//		log.fatal(err)
+			//	}
+
 			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
 				jobResult := data.(jenkinsconnect.JobOutcome)
 				switch jobResult.State {
 				case jenkinsconnect.SUCCESS:
-					furby.ExecuteCommand("laugh")
+					furby.ExecuteCommand("burp")
 				case jenkinsconnect.FAILED:
 					furby.ExecuteCommand("fart")
 				default:
 				}
 			})
 
-			//gobot.every(5*time.second, func() {
-			//	furby.toggle()
-			//	audiodriver.sound("resources/foo.wav")
-			//	if err := screen.write("writing, writing..."); err != nil {
-			//		log.fatal(err)
-			//	}
-
-			//	screen.setrgb(0, 255, 0)
-			//	// set a custom character in the first position
-			//	screen.setcustomchar(0, i2c.customlcdchars["smiley"])
-			//	// add the custom character at the end of the string
-			//	screen.write("goodbye\nhave a nice day " + string(byte(0)))
-			//	gobot.every(500*time.millisecond, func() {
-			//		screen.scroll(false)
-			//	})
-			//})
+			gobot.Every(40*time.Second, func() {
+			})
 
 			<-time.After(1 * time.Second)
-			//screen.setrgb(0, 0, 255)
 		}
 
 		robot := gobot.NewRobot("furbyBot",

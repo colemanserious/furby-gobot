@@ -6,6 +6,7 @@ import (
 	"github.com/hybridgroup/gobot/platforms/gpio"
 	"os"
 	"strings"
+	"time"
 )
 
 var _ gobot.Driver = (*FurbyDriver)(nil)
@@ -19,6 +20,8 @@ var commands = map[string]string{
 	"laugh":   "863-laugh.wav",
 	"fart":    "865-fart.wav",
 	"whisper": "719-whisper.wav",
+	"sleep": "718-sleep.wav",	
+	"listen": "820-listen.wav",
 }
 
 var commandList = []string{}
@@ -81,6 +84,15 @@ func (f *FurbyDriver) Connection() gobot.Connection {
 }
 
 func (f *FurbyDriver) Start() (errs []error) {
+
+	// keep furby "listening" and awake.  Keeps it from uttering silly things
+	// other than the silly ones we want it to give..
+	f.ExecuteCommand("listen")
+
+	// Keep telling it to listen - it forgets.  
+	gobot.Every(40*time.Second, func() {
+		f.ExecuteCommand("listen")
+	})
 	return
 }
 
@@ -88,7 +100,7 @@ func (f *FurbyDriver) Halt() (errs []error) {
 	return
 }
 
-// State return true if the led is On and false if the led is Off
+// State return true if the Furby is On and false if the Furby is Off
 func (f *FurbyDriver) State() bool {
 	return f.high
 }
@@ -96,25 +108,29 @@ func (f *FurbyDriver) State() bool {
 // Pin returns the GPIO pin in use
 func (f *FurbyDriver) Pin() string { return f.pin }
 
-// On sets the led to a high state.
+// On sets the Furby to a high state.
 func (f *FurbyDriver) On() (err error) {
+	fmt.Println("Turning furby on ")
 	if err = f.connection.DigitalWrite(f.Pin(), 1); err != nil {
-		return
+		fmt.Println("Unable to turn furby on: %v",err)
+		return err
 	}
 	f.high = true
 	return
 }
 
-// Off sets the led to a low state.
+// Off sets the Furby to a low state (low = off).
 func (f *FurbyDriver) Off() (err error) {
+	fmt.Println("Turning furby off ")
 	if err = f.connection.DigitalWrite(f.Pin(), 0); err != nil {
+		fmt.Println("Unable to turn furby off %v", err)
 		return
 	}
 	f.high = false
 	return
 }
 
-// Toggle sets the led to the opposite of it's current state
+// Toggle sets the Furby to the opposite of its current state
 func (f *FurbyDriver) Toggle() (err error) {
 	if f.State() {
 		err = f.Off()
@@ -126,6 +142,10 @@ func (f *FurbyDriver) Toggle() (err error) {
 
 func (f *FurbyDriver) ExecuteCommand(command string) (err error) {
 
+	if !f.State() {
+		f.On()
+	}	
+	
 	if file, ok := commands[command]; ok {
 		f.soundQueue <- file
 		return
