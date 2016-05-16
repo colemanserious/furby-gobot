@@ -20,8 +20,8 @@ var commands = map[string]string{
 	"laugh":   "863-laugh.wav",
 	"fart":    "865-fart.wav",
 	"whisper": "719-whisper.wav",
-	"sleep": "718-sleep.wav",	
-	"listen": "820-listen.wav",
+	"sleep":   "718-sleep.wav",
+	"listen":  "820-listen.wav",
 }
 
 var commandList = []string{}
@@ -84,16 +84,19 @@ func (f *FurbyDriver) Connection() gobot.Connection {
 }
 
 func (f *FurbyDriver) Start() (errs []error) {
+	go f.keepListening()
 
-	// keep furby "listening" and awake.  Keeps it from uttering silly things
-	// other than the silly ones we want it to give..
+	fmt.Println("Started Furby driver")
+	return
+}
+
+// keep furby "listening" and awake.  Keeps it from uttering silly things
+// other than the silly ones we want it to give..
+func (f *FurbyDriver) keepListening() {
 	f.ExecuteCommand("listen")
-
-	// Keep telling it to listen - it forgets.  
 	gobot.Every(40*time.Second, func() {
 		f.ExecuteCommand("listen")
 	})
-	return
 }
 
 func (f *FurbyDriver) Halt() (errs []error) {
@@ -112,7 +115,7 @@ func (f *FurbyDriver) Pin() string { return f.pin }
 func (f *FurbyDriver) On() (err error) {
 	fmt.Println("Turning furby on ")
 	if err = f.connection.DigitalWrite(f.Pin(), 1); err != nil {
-		fmt.Println("Unable to turn furby on: %v",err)
+		fmt.Println("Unable to turn furby on: %v", err)
 		return err
 	}
 	f.high = true
@@ -144,8 +147,8 @@ func (f *FurbyDriver) ExecuteCommand(command string) (err error) {
 
 	if !f.State() {
 		f.On()
-	}	
-	
+	}
+
 	if file, ok := commands[command]; ok {
 		f.soundQueue <- file
 		return
