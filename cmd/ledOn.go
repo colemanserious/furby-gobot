@@ -24,16 +24,13 @@ import (
 	"fmt"
 
 	"github.com/colemanserious/furby-gobot/audio"
-	"github.com/colemanserious/furby-gobot/jenkinsconnect"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 
-	"log"
 	"time"
 )
 
@@ -55,47 +52,25 @@ to quickly create a Cobra application.`,
 
 		r := raspi.NewRaspiAdaptor("raspi")
 		audioAdaptor := audio.NewAudioAdaptor("sound")
-		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
 
 		// Note: see issue #250 in Gobot repo: the pin listed here is NOT the GPIO pin itself, but the pin #.
 		// Gobot maps the pin to the GPIO pin
 		led := gpio.NewLedDriver(r, "led", "33")
 		//led := gpio.NewLedDriver(r, "led", "16")
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", nil)
-		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
-		screen := i2c.NewGroveLcdDriver(r, "screen")
 		work := func() {
-
-			screen.Clear()
-			screen.Home()
-
-			//screen.SetRGB(255, 0, 0)
 
 			gobot.Every(5*time.Second, func() {
 				led.Toggle()
 				audioDriver.Sound("resources/foo.wav")
-				if err := screen.Write("Writing, writing..."); err != nil {
-					log.Fatal(err)
-				}
-
-				screen.SetRGB(0, 255, 0)
-				// set a custom character in the first position
-				screen.SetCustomChar(0, i2c.CustomLCDChars["smiley"])
-				// add the custom character at the end of the string
-				screen.Write("goodbye\nhave a nice day " + string(byte(0)))
-				gobot.Every(500*time.Millisecond, func() {
-					screen.Scroll(false)
-				})
 			})
 
-			<-time.After(1 * time.Second)
-			//screen.SetRGB(0, 0, 255)
 		}
 
 		robot := gobot.NewRobot("furbyBot",
 			[]gobot.Connection{r, audioAdaptor},
-			[]gobot.Device{led, audioDriver, screen, jenkinsDriver},
+			[]gobot.Device{led, audioDriver },
 			work,
 		)
 
