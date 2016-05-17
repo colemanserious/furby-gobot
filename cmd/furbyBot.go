@@ -30,11 +30,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/hybridgroup/gobot"
-	//"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 
-	"time"
-	//"log"
+	//"time"
+	"log"
 )
 
 // furbyBotCmd represents the furbyBot command
@@ -59,42 +59,48 @@ to quickly create a Cobra application.`,
 
 		// Set up asynchronous channel - if we get more than 3 sounds being played in a row, something's up
 		csoundFiles := make(chan string, 3)
-		furby := furby.NewFurbyDriver(r, "furby", "13", csoundFiles)
+		furby := furby.NewFurbyDriver(r, "furby", "16", csoundFiles)
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", csoundFiles)
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsAdaptor, "jenkins-command")
 
-		//screen := i2c.NewGroveLcdDriver(r, "screen")
+		screen := i2c.NewGroveLcdDriver(r, "screen")
 		work := func() {
 
-			//screen.Clear()
-			//screen.Home()
+			screen.Clear()
+			screen.Home()
+			furby.On()
 
-			//screen.SetRGB(255, 0, 0)
-			//	if err := screen.write("writing, writing..."); err != nil {
-			//		log.fatal(err)
-			//	}
+			screen.SetRGB(255, 255, 255)
+
+			if err := screen.Write("Furby say hi!!"); err != nil {
+				log.Fatal(err)
+			}
 
 			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
 				jobResult := data.(jenkinsconnect.JobOutcome)
 				switch jobResult.State {
 				case jenkinsconnect.SUCCESS:
+					screen.Home()
+					screen.Clear()
+					screen.SetRGB(0, 255, 0)
+					screen.Write("Success:\n" + jobResult.Name)
 					furby.ExecuteCommand("burp")
 				case jenkinsconnect.FAILED:
+					screen.Home()
+					screen.Clear()
+					screen.SetRGB(255, 0, 0)
+					screen.Write(" FAIL:\n" + jobResult.Name)
 					furby.ExecuteCommand("fart")
 				default:
 				}
 			})
 
-			gobot.Every(40*time.Second, func() {
-			})
-
-			<-time.After(1 * time.Second)
 		}
 
 		robot := gobot.NewRobot("furbyBot",
 			[]gobot.Connection{r, audioAdaptor},
-			//[]gobot.Device{furby, audioDriver, screen, jenkinsDriver},
-			[]gobot.Device{furby, audioDriver, jenkinsDriver},
+			[]gobot.Device{furby, audioDriver, screen, jenkinsDriver},
+			//[]gobot.Device{furby, audioDriver, jenkinsDriver},
 			work,
 		)
 
