@@ -40,7 +40,7 @@ import (
 // ledOnCmd represents the ledOn command
 var ledOnCmd = &cobra.Command{
 	Use:   "ledOn",
-	Short: "A brief description of your command",
+	Short: "Toggle led on pin 13",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

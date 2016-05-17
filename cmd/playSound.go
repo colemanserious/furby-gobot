@@ -30,15 +30,13 @@ import (
 // playSoundCmd represents the playSound command
 var playSoundCmd = &cobra.Command{
 	Use:   "playSound",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Play a sound file given as an argument.",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		if len(args) == 0 {
+			log.Println("Must provide filename")
+			return
+		}
 		err := sounds.PlayWav(args[0])
 		if err != nil {
 			log.Println("Unable to execute command - could not play sound.")
@@ -48,15 +46,5 @@ to quickly create a Cobra application.`,
 
 func init() {
 	RootCmd.AddCommand(playSoundCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// playSoundCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// playSoundCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 }

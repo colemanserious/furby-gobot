@@ -40,7 +40,7 @@ import (
 // furbyBotCmd represents the furbyBot command
 var furbyBotCmd = &cobra.Command{
 	Use:   "furbyBot",
-	Short: "A brief description of your command",
+	Short: "Primary command for project - set up gobot Furby interaction",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
