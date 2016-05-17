@@ -59,7 +59,7 @@ to quickly create a Cobra application.`,
 
 		// Set up asynchronous channel - if we get more than 3 sounds being played in a row, something's up
 		csoundFiles := make(chan string, 3)
-		furby := furby.NewFurbyDriver(r, "furby", "13", csoundFiles)
+		furby := furby.NewFurbyDriver(r, "furby", "16", csoundFiles)
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", csoundFiles)
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsAdaptor, "jenkins-command")
 
@@ -68,6 +68,7 @@ to quickly create a Cobra application.`,
 
 			screen.Clear()
 			screen.Home()
+			furby.On()
 
 			screen.SetRGB(255, 255, 255)
 
