@@ -57,7 +57,10 @@ to quickly create a Cobra application.`,
 		audioAdaptor := audio.NewAudioAdaptor("sound")
 		jenkinsConnect := jenkinsconnect.NewJenkinsconnectAdaptor("jenkins")
 
-		led := gpio.NewLedDriver(r, "led", "13")
+		// Note: see issue #250 in Gobot repo: the pin listed here is NOT the GPIO pin itself, but the pin #.
+		// Gobot maps the pin to the GPIO pin
+		led := gpio.NewLedDriver(r, "led", "33")
+		//led := gpio.NewLedDriver(r, "led", "16")
 		audioDriver := audio.NewAudioDriver(audioAdaptor, "sounds", nil)
 		jenkinsDriver := jenkinsconnect.NewJenkinsconnectDriver(jenkinsConnect, "jenkins-command")
 
