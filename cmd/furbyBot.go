@@ -77,21 +77,23 @@ to quickly create a Cobra application.`,
 			}
 
 			gobot.On(jenkinsDriver.Event("jobResult"), func(data interface{}) {
-				jobResult := data.(jenkinsconnect.JobOutcome)
-				switch jobResult.State {
-				case jenkinsconnect.SUCCESS:
-					screen.Home()
-					screen.Clear()
-					screen.SetRGB(0, 255, 0)
-					screen.Write("Success:\n" + jobResult.Name)
-					furby.ExecuteCommand("burp")
-				case jenkinsconnect.FAILED:
-					screen.Home()
-					screen.Clear()
-					screen.SetRGB(255, 0, 0)
-					screen.Write(" FAIL:\n" + jobResult.Name)
-					furby.ExecuteCommand("fart")
-				default:
+				jobResult, ok := data.(jenkinsconnect.JobOutcome)
+				if ok {
+					switch jobResult.State {
+					case jenkinsconnect.SUCCESS:
+						screen.Home()
+						screen.Clear()
+						screen.SetRGB(0, 255, 0)
+						screen.Write("Success:\n" + jobResult.Name)
+						furby.ExecuteCommand("burp")
+					case jenkinsconnect.FAILED:
+						screen.Home()
+						screen.Clear()
+						screen.SetRGB(255, 0, 0)
+						screen.Write(" FAIL:\n" + jobResult.Name)
+						furby.ExecuteCommand("fart")
+					default:
+					}
 				}
 			})
 
